@@ -40,8 +40,8 @@ local user32 = require("winapi_user32")
 
 -- HWND
 local hWnd = user32.FindWindowA(
-    "Notepad", -- (optional) LPCTSTR lpClassName
-    "Hello World" -- (optional) LPCTSTR lpClassName
+    "Notepad", -- (can be nil) LPCTSTR lpClassName
+    "Hello World" -- (can be nil) LPCTSTR lpWindowName
 )
 ```
 
@@ -139,9 +139,9 @@ local hWnd = -- previously acquired HWND
 
 -- int
 local result = user32.MessageBoxA(
-    hWnd, -- HWND hWnd
-    "This is a message", -- LPCTSTR lpText
-    "This is the title", -- LPCTSTR lpCaption
+    hWnd, -- (can be nil) HWND hWnd
+    "This is a message", -- (can be nil) LPCTSTR lpText
+    "This is the title", -- (can be nil) LPCTSTR lpCaption
     0 -- UINT uType
 )
 ```
