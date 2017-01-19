@@ -1,4 +1,5 @@
 #include <winapi_user32.h>
+#include <winapi_shared.h>
 
 #include <Windows.h>
 
@@ -7,7 +8,7 @@
 #include <lauxlib.h>
 
 #ifndef LUA_WINAPI_USER32_VERSION
-#define LUA_WINAPI_USER32_VERSION "0.0.1-0"
+#define LUA_WINAPI_USER32_VERSION "0.0.1-1"
 #endif
 
 #if LUA_VERSION_NUM < 502
@@ -36,22 +37,20 @@ static int lua_FindWindowA(lua_State *L)
 
 static int lua_GetWindowTextLengthA(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
-    lua_pushinteger(L, GetWindowTextLengthA(*hwnd));
+    HWND hwnd = lua_toHWND(L, 1);
+    lua_pushinteger(L, GetWindowTextLengthA(hwnd));
     return 1;
 }
 
 static int lua_GetWindowTextA(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
+    HWND hwnd = lua_toHWND(L, 1);
     lua_Integer length = luaL_checkinteger(L, 2);
 
     int bufferLength = (int)length + 1;
 
     char *buffer = (char *)(malloc(bufferLength));
-    lua_pushinteger(L, GetWindowTextA(*hwnd, buffer, bufferLength));
+    lua_pushinteger(L, GetWindowTextA(hwnd, buffer, bufferLength));
     lua_pushstring(L, buffer);
     free((void *)buffer);
     return 2;
@@ -59,24 +58,22 @@ static int lua_GetWindowTextA(lua_State *L)
 
 static int lua_GetWindowThreadProcessId(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
+    HWND hwnd = lua_toHWND(L, 1);
     DWORD dwProcessId;
-    lua_pushinteger(L, GetWindowThreadProcessId(*hwnd, &dwProcessId));
+    lua_pushinteger(L, GetWindowThreadProcessId(hwnd, &dwProcessId));
     lua_pushinteger(L, dwProcessId);
     return 2;
 }
 
 static int lua_GetClassNameA(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
+    HWND hwnd = lua_toHWND(L, 1);
     lua_Integer length = luaL_checkinteger(L, 2);
 
     int bufferLength = (int)length + 1;
 
     char *buffer = (char *)(malloc(bufferLength));
-    lua_pushinteger(L, GetClassNameA(*hwnd, buffer, bufferLength));
+    lua_pushinteger(L, GetClassNameA(hwnd, buffer, bufferLength));
     lua_pushstring(L, buffer);
     free((void *)buffer);
     return 2;
@@ -131,40 +128,33 @@ static int lua_EnumWindows(lua_State *L)
 
 static int lua_MessageBoxA(lua_State *L)
 {
-    HWND *hwnd = NULL;
-    if (!lua_isnil(L, 1))
-    {
-        void *userdata = lua_touserdata(L, 1);
-        hwnd = (HWND *)userdata;
-    }
+    HWND hwnd = lua_toHWND(L, 1);
     const char *lpText = luaL_optstring(L, 2, NULL);
     const char *lpCaption = luaL_optstring(L, 3, NULL);
     UINT uType = (UINT)(luaL_checkinteger(L, 4));
-    lua_pushinteger(L, MessageBoxA(*hwnd, lpText, lpCaption, uType));
+    lua_pushinteger(L, MessageBoxA(hwnd, lpText, lpCaption, uType));
     return 1;
 }
 
 static int lua_GetForegroundWindow(lua_State *L)
 {
     void *userdata = lua_newuserdata(L, sizeof(HWND));
-    *(HWND *)userdata = GetForegroundWindow();
+    *((HWND *)userdata) = GetForegroundWindow();
     return 1;
 }
 
 static int lua_SetForegroundWindow(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
-    lua_pushboolean(L, SetForegroundWindow(*hwnd));
+    HWND hwnd = lua_toHWND(L, 1);
+    lua_pushboolean(L, SetForegroundWindow(hwnd));
     return 1;
 }
 
 static int lua_FlashWindow(lua_State *L)
 {
-    void *userdata = lua_touserdata(L, 1);
-    HWND *hwnd = (HWND *)userdata;
+    HWND hwnd = lua_toHWND(L, 1);
     BOOL bInvert = lua_toboolean(L, 2);
-    lua_pushboolean(L, FlashWindow(*hwnd, bInvert));
+    lua_pushboolean(L, FlashWindow(hwnd, bInvert));
     return 1;
 }
 
